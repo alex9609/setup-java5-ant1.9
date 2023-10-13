@@ -1,0 +1,71 @@
+name: 'Setup Java5'
+description: 'Install Java 5 & Ant'
+inputs:
+  path-java:
+    description: 'Path  of Java5'
+    required: true
+    default: '/'
+  path-ant:
+    description: 'Path  of Ant'
+    required: true
+    default: '/'
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Imprimiendo path
+      run: |
+        echo ${{ inputs.path-java}}
+        echo ${{ inputs.path-ant}} 
+      shell: bash
+
+    - name: Install Java 5
+      run: |
+        echo Running install java 5
+        echo Started on `date`
+        sudo mkdir /usr/lib/jvm/java5
+        sudo cp ${{ inputs.path-java}} /usr/lib/jvm/java5/jdk-1_5_0_12-linux-amd64.bin
+        sudo chmod a+x /usr/lib/jvm/java5/jdk-1_5_0_12-linux-amd64.bin
+        sudo chown -R root:root /usr/lib/jvm/java5/
+        echo "Print folder"
+        ls -la /usr/lib/jvm/
+        cd /usr/lib/jvm/java5/
+        sudo echo "yes" | sudo ./jdk-1_5_0_12-linux-amd64.bin
+
+        sudo update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/java5/jdk1.5.0_12/bin/java" 1
+        sudo update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/java5/jdk1.5.0_12/bin/javac" 1
+
+        sudo update-alternatives --set java /usr/lib/jvm/java5/jdk1.5.0_12/bin/java
+        sudo update-alternatives --set javac /usr/lib/jvm/java5/jdk1.5.0_12/bin/javac
+
+        sudo chmod a+x /usr/bin/java
+        sudo chmod a+x /usr/bin/javac
+
+        sudo chown -R root:root /usr/lib/jvm/java5/
+        echo $JAVA_HOME
+        export JAVA_HOME=/usr/lib/jvm/java5/jdk1.5.0_12
+        echo $JAVA_HOME
+        echo $PATH
+        export PATH=$JAVA_HOME/bin:$PATH
+        echo "PATH changed"
+        echo $PATH
+        echo "java version"
+        java -version
+        echo Done on `date`
+      shell: bash
+
+    - name: Install Ant
+      run: | # Install Ant, specifict version that supports Java 5
+        sudo apt remove ant -y
+        sudo mkdir /opt/ant
+        sudo tar -xvf ${{ inputs.path-ant}}  -C /opt/ant
+        sudo update-alternatives --install "/usr/bin/ant" "ant" "/opt/ant/apache-ant-1.7.1/bin/ant" 1
+        sudo update-alternatives --set ant /opt/ant/apache-ant-1.7.1/bin/ant
+        export ANT_HOME=/opt/ant/apache-ant-1.7.1
+        echo $PATH
+        export PATH=$ANT_HOME/bin:$PATH
+        echo "PATH changed"
+        echo $PATH
+      shell: bash
