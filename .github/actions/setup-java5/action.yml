@@ -1,21 +1,17 @@
 name: 'Setup Java5'
-description: 'Install Java 5 & Ant'
+description: 'Install Java 5'
 inputs:
   path-java:
     description: 'Path  of Java5'
     required: true
     default: '/'
-  path-ant:
-    description: 'Path  of Ant'
-    required: true
-    default: '/'
+
 runs:
   using: 'composite'
   steps:
     - name: Imprimiendo path
       run: |
         echo ${{ inputs.path-java}}
-        echo ${{ inputs.path-ant}} 
       shell: bash
 
     - name: Install Java 5
@@ -53,16 +49,3 @@ runs:
         echo Done on `date`
       shell: bash
 
-    - name: Install Ant
-      run: | # Install Ant, specifict version that supports Java 5
-        sudo apt remove ant -y
-        sudo mkdir /opt/ant
-        sudo tar -xvf ${{ inputs.path-ant}}  -C /opt/ant
-        sudo update-alternatives --install "/usr/bin/ant" "ant" "/opt/ant/apache-ant-1.7.1/bin/ant" 1
-        sudo update-alternatives --set ant /opt/ant/apache-ant-1.7.1/bin/ant
-        export ANT_HOME=/opt/ant/apache-ant-1.7.1
-        echo $PATH
-        export PATH=$ANT_HOME/bin:$PATH
-        echo "PATH changed"
-        echo $PATH
-      shell: bash
